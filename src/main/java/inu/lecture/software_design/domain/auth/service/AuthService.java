@@ -12,7 +12,7 @@ import inu.lecture.software_design.domain.student.entity.Student;
 import inu.lecture.software_design.domain.student.repository.StudentRepository;
 import inu.lecture.software_design.domain.teacher.entity.Teacher;
 import inu.lecture.software_design.domain.teacher.repository.TeacherRepository;
-import inu.lecture.software_design.domain.user.entity.UserRole;
+import inu.lecture.software_design.domain.user.enums.UserRole;
 import inu.lecture.software_design.domain.user.repository.UserRepository;
 import inu.lecture.software_design.global.exception.CustomException;
 import inu.lecture.software_design.global.exception.ErrorCode;

@@ -1,4 +1,4 @@
-package inu.lecture.software_design.domain.user.entity;
+package inu.lecture.software_design.domain.admin.entity;
 
 import inu.lecture.software_design.global.entity.BaseEntity;
 import jakarta.persistence.*;

@@ -1,6 +1,6 @@
 package inu.lecture.software_design.domain.notification.entity;
 
-import inu.lecture.software_design.domain.user.entity.UserRole;
+import inu.lecture.software_design.domain.user.enums.UserRole;
 import inu.lecture.software_design.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -39,8 +39,8 @@ public class Notification extends BaseEntity {
     /** 알림 대상 엔티티 ID (성적 ID, 피드백 ID 등) */
     private Long referenceId;
 
-    @Column(nullable = false)
-    private boolean read;
+    @Column(name = "is_read", nullable = false)
+    private boolean isRead;
 
     private Notification(String receiverUsername, UserRole receiverRole,
                          NotificationType notificationType, String message, Long referenceId) {
@@ -49,7 +49,7 @@ public class Notification extends BaseEntity {
         this.notificationType = notificationType;
         this.message = message;
         this.referenceId = referenceId;
-        this.read = false;
+        this.isRead = false;
     }
 
     public static Notification of(String receiverUsername, UserRole receiverRole,
@@ -58,6 +58,6 @@ public class Notification extends BaseEntity {
     }
 
     public void markAsRead() {
-        this.read = true;
+        this.isRead = true;
     }
 }

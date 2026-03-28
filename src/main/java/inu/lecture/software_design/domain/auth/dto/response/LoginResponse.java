@@ -1,6 +1,6 @@
 package inu.lecture.software_design.domain.auth.dto.response;
 
-import inu.lecture.software_design.domain.user.entity.UserRole;
+import inu.lecture.software_design.domain.user.enums.UserRole;
 import lombok.Builder;
 import lombok.Getter;
 

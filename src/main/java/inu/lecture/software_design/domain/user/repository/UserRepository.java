@@ -1,6 +1,6 @@
 package inu.lecture.software_design.domain.user.repository;
 
-import inu.lecture.software_design.domain.user.entity.Admin;
+import inu.lecture.software_design.domain.admin.entity.Admin;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
