@@ -11,8 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -64,23 +66,40 @@ public class CounselingController {
     }
 
     /**
-     * CEW-48: 특정 학생 상담 이력 조회
-     * GET /api/v1/counselings/student/{studentId}
+     * CEW-48/55: 특정 학생 상담 이력 조회 (날짜 범위 필터 선택)
+     * GET /api/v1/counselings/student/{studentId}?from=2025-01-01&to=2025-12-31
      */
     @GetMapping("/student/{studentId}")
     public ResponseEntity<ApiResponse<List<CounselingResponse>>> getCounselingsByStudent(
-            @PathVariable Long studentId) {
-        List<CounselingResponse> response = counselingService.getCounselingsByStudent(studentId);
+            @PathVariable Long studentId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+        List<CounselingResponse> response = counselingService.getCounselingsByStudent(studentId, from, to);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     /**
-     * CEW-49: 공유된 상담 기록 조회 (다른 교사도 열람 가능)
+     * CEW-49: 공유된 상담 기록 전체 조회
      * GET /api/v1/counselings/shared
      */
     @GetMapping("/shared")
     public ResponseEntity<ApiResponse<List<CounselingResponse>>> getSharedCounselings() {
         List<CounselingResponse> response = counselingService.getSharedCounselings();
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    /**
+     * CEW-50/51: 공유 상담 검색 (키워드/날짜/학생/교사 기준)
+     * GET /api/v1/counselings/search?keyword=진로&from=2025-01-01&to=2025-12-31&studentId=1&teacherId=2
+     */
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<List<CounselingResponse>>> searchCounselings(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            @RequestParam(required = false) Long studentId,
+            @RequestParam(required = false) Long teacherId) {
+        List<CounselingResponse> response = counselingService.searchSharedCounselings(keyword, from, to, studentId, teacherId);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 

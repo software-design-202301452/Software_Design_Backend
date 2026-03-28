@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -78,25 +79,37 @@ public class CounselingService {
     }
 
     /**
-     * CEW-48: 특정 학생 상담 이력 조회
+     * CEW-48/55: 특정 학생 상담 이력 조회 (날짜 범위 필터 선택)
      */
     @Transactional(readOnly = true)
-    public List<CounselingResponse> getCounselingsByStudent(Long studentId) {
+    public List<CounselingResponse> getCounselingsByStudent(Long studentId, LocalDate from, LocalDate to) {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new CustomException(ErrorCode.STUDENT_NOT_FOUND));
 
-        return counselingRepository.findByStudentOrderByCounselingDateDesc(student)
+        return counselingRepository.findByStudentWithDateFilter(student, from, to)
                 .stream()
                 .map(this::toResponse)
                 .toList();
     }
 
     /**
-     * CEW-49: 공유된 상담 기록 조회 (다른 교사도 열람 가능)
+     * CEW-49: 공유된 상담 기록 전체 조회
      */
     @Transactional(readOnly = true)
     public List<CounselingResponse> getSharedCounselings() {
         return counselingRepository.findBySharedTrueOrderByCounselingDateDesc()
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    /**
+     * CEW-50/51: 공유 상담 키워드/날짜/학생/교사 기준 검색
+     */
+    @Transactional(readOnly = true)
+    public List<CounselingResponse> searchSharedCounselings(String keyword, LocalDate from, LocalDate to,
+                                                             Long studentId, Long teacherId) {
+        return counselingRepository.searchSharedCounselings(keyword, from, to, studentId, teacherId)
                 .stream()
                 .map(this::toResponse)
                 .toList();
