@@ -61,11 +61,11 @@ public class StudentService {
     }
 
     /**
-     * CEW-26: 학년/반/번호 기준으로 학생 목록 조회 (null이면 전체)
+     * CEW-26/52: 이름(부분일치)/학년/반/번호 기준으로 학생 목록 조회 (null이면 전체)
      */
     @Transactional(readOnly = true)
-    public List<StudentSummaryResponse> getStudents(Integer grade, Integer classNum, Integer studentNumber) {
-        return studentRepository.findByFilter(grade, classNum, studentNumber)
+    public List<StudentSummaryResponse> getStudents(String name, Integer grade, Integer classNum, Integer studentNumber) {
+        return studentRepository.findByFilterWithName(name, grade, classNum, studentNumber)
                 .stream()
                 .map(this::toSummary)
                 .toList();

@@ -39,16 +39,17 @@ public class StudentController {
     }
 
     /**
-     * CEW-26: 학년/반/번호 기준으로 학생 목록 조회
-     * GET /api/v1/students?grade=1&classNum=2&studentNumber=3
+     * CEW-26/52: 이름(부분일치)/학년/반/번호 기준으로 학생 목록 조회
+     * GET /api/v1/students?name=김&grade=1&classNum=2&studentNumber=3
      * 파라미터 생략 시 전체 목록 반환
      */
     @GetMapping
     public ResponseEntity<ApiResponse<List<StudentSummaryResponse>>> getStudents(
+            @RequestParam(required = false) String name,
             @RequestParam(required = false) Integer grade,
             @RequestParam(required = false) Integer classNum,
             @RequestParam(required = false) Integer studentNumber) {
-        List<StudentSummaryResponse> response = studentService.getStudents(grade, classNum, studentNumber);
+        List<StudentSummaryResponse> response = studentService.getStudents(name, grade, classNum, studentNumber);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 

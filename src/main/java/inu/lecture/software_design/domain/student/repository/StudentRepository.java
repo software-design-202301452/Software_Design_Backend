@@ -24,4 +24,16 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     List<Student> findByFilter(@Param("grade") Integer grade,
                                @Param("classNum") Integer classNum,
                                @Param("studentNumber") Integer studentNumber);
+
+    /** CEW-52: 이름(부분일치)/학년/반/번호 기준 학생 검색 */
+    @Query("SELECT s FROM Student s WHERE " +
+           "(:name IS NULL OR s.name LIKE %:name%) AND " +
+           "(:grade IS NULL OR s.grade = :grade) AND " +
+           "(:classNum IS NULL OR s.classNum = :classNum) AND " +
+           "(:studentNumber IS NULL OR s.studentNumber = :studentNumber) " +
+           "ORDER BY s.grade ASC, s.classNum ASC, s.studentNumber ASC")
+    List<Student> findByFilterWithName(@Param("name") String name,
+                                       @Param("grade") Integer grade,
+                                       @Param("classNum") Integer classNum,
+                                       @Param("studentNumber") Integer studentNumber);
 }
