@@ -17,6 +17,9 @@ public interface GradeRepository extends JpaRepository<Grade, Long> {
     /** CEW-37: 학생별 전체 성적 조회 (연도 내림차순, 학기 오름차순) */
     List<Grade> findByStudentOrderByYearDescSemesterAsc(Student student);
 
+    /** CEW-69: 최근 성적 n건 조회 */
+    List<Grade> findTop5ByOrderByCreatedAtDesc();
+
     /** CEW-38: 과목/연도/학기 기준 필터 조회 (null 이면 전체) */
     @Query("SELECT g FROM Grade g WHERE g.student = :student " +
            "AND (:subjectId IS NULL OR g.subject.id = :subjectId) " +

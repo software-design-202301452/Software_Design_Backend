@@ -103,7 +103,8 @@ public class SecurityConfig {
             "/api/v1/feedbacks/**",
             "/api/v1/student-records/**",
             "/api/v1/students/**",
-            "/api/v1/subjects/**"
+            "/api/v1/subjects/**",
+            "/api/v1/dashboard/**"
     };
 
     // 학부모만 접근 가능한 엔드포인트

@@ -26,4 +26,7 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
     );
 
     List<Feedback> findByStudentAndPublishedTrue(Student student);
+
+    /** CEW-69: 최근 피드백 n건 조회 */
+    List<Feedback> findTop5ByOrderByCreatedAtDesc();
 }
