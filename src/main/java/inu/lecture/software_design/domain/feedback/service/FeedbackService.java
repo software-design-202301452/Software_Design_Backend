@@ -5,6 +5,7 @@ import inu.lecture.software_design.domain.feedback.dto.request.UpdateFeedbackReq
 import inu.lecture.software_design.domain.feedback.dto.response.FeedbackResponse;
 import inu.lecture.software_design.domain.feedback.entity.Feedback;
 import inu.lecture.software_design.domain.feedback.repository.FeedbackRepository;
+import inu.lecture.software_design.domain.notification.service.NotificationService;
 import inu.lecture.software_design.domain.student.entity.Student;
 import inu.lecture.software_design.domain.student.repository.StudentRepository;
 import inu.lecture.software_design.domain.teacher.entity.Teacher;
@@ -28,6 +29,7 @@ public class FeedbackService {
     private final FeedbackRepository feedbackRepository;
     private final StudentRepository studentRepository;
     private final TeacherRepository teacherRepository;
+    private final NotificationService notificationService;
 
     /**
      * CEW-39: 교사가 학생 피드백 작성
@@ -47,6 +49,9 @@ public class FeedbackService {
 
         log.info("피드백 등록 - teacherId: {}, studentId: {}, type: {}",
                 teacher.getId(), student.getId(), request.getFeedbackType());
+
+        // CEW-58: 피드백 등록 시 학생 알림 생성
+        notificationService.notifyFeedbackCreated(student, feedback);
 
         return toResponse(feedback);
     }
@@ -85,6 +90,10 @@ public class FeedbackService {
                 .orElseThrow(() -> new CustomException(ErrorCode.FEEDBACK_NOT_FOUND));
         feedback.publish();
         log.info("피드백 공개 - feedbackId: {}", feedbackId);
+
+        // CEW-60: 피드백 공개 시 학생 + 학부모 알림
+        notificationService.notifyFeedbackPublished(feedback.getStudent(), feedback);
+
         return toResponse(feedback);
     }
 

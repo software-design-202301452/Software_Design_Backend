@@ -5,6 +5,7 @@ import inu.lecture.software_design.domain.counseling.dto.request.UpdateCounselin
 import inu.lecture.software_design.domain.counseling.dto.response.CounselingResponse;
 import inu.lecture.software_design.domain.counseling.entity.Counseling;
 import inu.lecture.software_design.domain.counseling.repository.CounselingRepository;
+import inu.lecture.software_design.domain.notification.service.NotificationService;
 import inu.lecture.software_design.domain.student.entity.Student;
 import inu.lecture.software_design.domain.student.repository.StudentRepository;
 import inu.lecture.software_design.domain.teacher.entity.Teacher;
@@ -27,6 +28,7 @@ public class CounselingService {
     private final CounselingRepository counselingRepository;
     private final StudentRepository studentRepository;
     private final TeacherRepository teacherRepository;
+    private final NotificationService notificationService;
 
     /**
      * CEW-45: 상담 날짜/내용/다음 계획 등록
@@ -50,6 +52,9 @@ public class CounselingService {
         log.info("상담 등록 - teacherId: {}, studentId: {}, date: {}",
                 teacher.getId(), student.getId(), request.getCounselingDate());
 
+        // CEW-59: 상담 등록 시 교사 알림
+        notificationService.notifyCounselingUpdated(teacher, student, counseling.getId());
+
         return toResponse(counseling);
     }
 
@@ -63,6 +68,10 @@ public class CounselingService {
 
         counseling.update(request.getContent(), request.getNextPlan(), request.getNextCounselingDate());
         log.info("상담 수정 - counselingId: {}", counselingId);
+
+        // CEW-59: 상담 수정 시 담당 교사 알림
+        notificationService.notifyCounselingUpdated(
+                counseling.getTeacher(), counseling.getStudent(), counselingId);
 
         return toResponse(counseling);
     }

@@ -55,7 +55,10 @@ public enum ErrorCode {
 
     // 학생부
     STUDENT_RECORD_NOT_FOUND(HttpStatus.NOT_FOUND, "RECORD_001", "학생부 정보를 찾을 수 없습니다."),
-    STUDENT_RECORD_ALREADY_EXISTS(HttpStatus.CONFLICT, "RECORD_002", "해당 학생의 동일 학년도/학기 학생부가 이미 존재합니다.");
+    STUDENT_RECORD_ALREADY_EXISTS(HttpStatus.CONFLICT, "RECORD_002", "해당 학생의 동일 학년도/학기 학생부가 이미 존재합니다."),
+
+    // 알림
+    NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTIFICATION_001", "알림을 찾을 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;

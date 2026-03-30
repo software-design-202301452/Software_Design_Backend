@@ -5,6 +5,7 @@ import inu.lecture.software_design.domain.grade.dto.request.UpdateGradeRequest;
 import inu.lecture.software_design.domain.grade.dto.response.GradeResponse;
 import inu.lecture.software_design.domain.grade.entity.Grade;
 import inu.lecture.software_design.domain.grade.repository.GradeRepository;
+import inu.lecture.software_design.domain.notification.service.NotificationService;
 import inu.lecture.software_design.domain.student.entity.Student;
 import inu.lecture.software_design.domain.student.repository.StudentRepository;
 import inu.lecture.software_design.domain.subject.entity.Subject;
@@ -29,6 +30,7 @@ public class GradeService {
     private final StudentRepository studentRepository;
     private final SubjectRepository subjectRepository;
     private final TeacherRepository teacherRepository;
+    private final NotificationService notificationService;
 
     /**
      * CEW-32: 교사가 학생 성적 입력
@@ -64,6 +66,9 @@ public class GradeService {
         log.info("성적 등록 - studentId: {}, subjectId: {}, year: {}, semester: {}, grade: {}",
                 student.getId(), subject.getId(), request.getYear(), request.getSemester(), grade.getGradeLevel());
 
+        // CEW-57: 성적 등록 시 학생 + 학부모 알림
+        notificationService.notifyGradeUpdated(student, grade);
+
         return toResponse(grade);
     }
 
@@ -83,6 +88,9 @@ public class GradeService {
         grade.updateScore(request.getScore(), request.getTotalScore(), average, request.getNote());
 
         log.info("성적 수정 - gradeId: {}, 새 등급: {}", gradeId, grade.getGradeLevel());
+
+        // CEW-57: 성적 수정 시 학생 + 학부모 알림
+        notificationService.notifyGradeUpdated(grade.getStudent(), grade);
 
         return toResponse(grade);
     }
