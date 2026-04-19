@@ -1,6 +1,7 @@
 package inu.lecture.software_design.domain.teacher.entity;
 
 import inu.lecture.software_design.global.entity.BaseEntity;
+import inu.lecture.software_design.global.security.encryption.EncryptionConverter;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -33,7 +34,8 @@ public class Teacher extends BaseEntity {
     private String department;
 
     /** 연락처 */
-    @Column(length = 20)
+    @Convert(converter = EncryptionConverter.class)
+    @Column(length = 100)
     private String phone;
 
     private Teacher(String username, String password, String email, String name,

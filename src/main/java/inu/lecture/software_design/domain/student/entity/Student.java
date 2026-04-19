@@ -1,6 +1,7 @@
 package inu.lecture.software_design.domain.student.entity;
 
 import inu.lecture.software_design.global.entity.BaseEntity;
+import inu.lecture.software_design.global.security.encryption.EncryptionConverter;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -39,10 +40,12 @@ public class Student extends BaseEntity {
     @Column(nullable = false)
     private Integer studentNumber;
 
-    @Column(length = 200)
+    @Convert(converter = EncryptionConverter.class)
+    @Column(length = 500)
     private String address;
 
-    @Column(length = 20)
+    @Convert(converter = EncryptionConverter.class)
+    @Column(length = 100)
     private String phone;
 
     /**
