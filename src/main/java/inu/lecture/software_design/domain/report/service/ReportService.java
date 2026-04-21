@@ -124,7 +124,7 @@ public class ReportService {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new CustomException(ErrorCode.STUDENT_NOT_FOUND));
 
-        List<Feedback> feedbacks = feedbackRepository.findByFilter(studentId, null, null, null);
+        List<Feedback> feedbacks = feedbackRepository.findByFilter(studentId, null, null, null, null);
 
         // 타입별 카운트 맵
         Map<String, Long> typeCountMap = feedbacks.stream()
