@@ -74,6 +74,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
+                        .requestMatchers(STUDENT_ENDPOINTS).hasRole("STUDENT")
                         .requestMatchers(TEACHER_ENDPOINTS).hasRole("TEACHER")
                         .requestMatchers(PARENT_ENDPOINTS).hasRole("PARENT")
                         .requestMatchers(ADMIN_ENDPOINTS).hasRole("ADMIN")
@@ -96,6 +97,11 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/actuator/health"
+    };
+
+    // 학생만 접근 가능한 엔드포인트
+    private static final String[] STUDENT_ENDPOINTS = {
+            "/api/v1/student/**"
     };
 
     // 교사만 접근 가능한 엔드포인트
