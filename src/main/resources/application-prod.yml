@@ -1,18 +1,17 @@
 spring:
   datasource:
-    url: ${MYSQL_URL}
+    url: jdbc:mysql:///${MYSQL_DATABASE}?cloudSqlInstance=${CLOUD_SQL_INSTANCE}&socketFactory=com.google.cloud.sql.mysql.SocketFactory&enableIamAuth=false
     username: ${MYSQL_USERNAME}
     password: ${MYSQL_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
-      ddl-auto: create
-    show-sql: true
+      ddl-auto: update
+    show-sql: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
-        format_sql: true
+        format_sql: false
         jdbc:
           time_zone: Asia/Seoul
 
@@ -30,12 +29,10 @@ jwt:
   access-token-validity-in-seconds: 1800
   refresh-token-validity-in-seconds: 604800
 
-# 교사 가입 인증 코드
 teacher:
   registration-code: ${TEACHER_REGISTRATION_CODE}
 
 logging:
   level:
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    inu.lecture.software_design: DEBUG
+    org.hibernate.SQL: WARN
+    inu.lecture.software_design: INFO
