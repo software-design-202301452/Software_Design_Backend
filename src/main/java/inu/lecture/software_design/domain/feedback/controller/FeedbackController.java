@@ -3,6 +3,7 @@ package inu.lecture.software_design.domain.feedback.controller;
 import inu.lecture.software_design.domain.feedback.dto.request.CreateFeedbackRequest;
 import inu.lecture.software_design.domain.feedback.dto.request.UpdateFeedbackRequest;
 import inu.lecture.software_design.domain.feedback.dto.response.FeedbackResponse;
+import inu.lecture.software_design.domain.feedback.entity.FeedbackType;
 import inu.lecture.software_design.domain.feedback.service.FeedbackService;
 import inu.lecture.software_design.global.response.ApiResponse;
 import jakarta.validation.Valid;
@@ -89,16 +90,17 @@ public class FeedbackController {
     }
 
     /**
-     * CEW-44: 피드백 필터 조회 (studentId, teacherId, from, to 선택)
-     * GET /api/v1/feedbacks?studentId=&teacherId=&from=&to=
+     * CEW-44: 피드백 필터 조회 (studentId, teacherId, feedbackType, from, to 선택)
+     * GET /api/v1/feedbacks?studentId=&teacherId=&feedbackType=&from=&to=
      */
     @GetMapping
     public ResponseEntity<ApiResponse<List<FeedbackResponse>>> getFeedbacks(
             @RequestParam(required = false) Long studentId,
             @RequestParam(required = false) Long teacherId,
+            @RequestParam(required = false) FeedbackType feedbackType,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
-        List<FeedbackResponse> response = feedbackService.getFeedbacks(studentId, teacherId, from, to);
+        List<FeedbackResponse> response = feedbackService.getFeedbacks(studentId, teacherId, feedbackType, from, to);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 }

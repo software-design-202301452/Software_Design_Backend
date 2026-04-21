@@ -4,6 +4,7 @@ import inu.lecture.software_design.domain.feedback.dto.request.CreateFeedbackReq
 import inu.lecture.software_design.domain.feedback.dto.request.UpdateFeedbackRequest;
 import inu.lecture.software_design.domain.feedback.dto.response.FeedbackResponse;
 import inu.lecture.software_design.domain.feedback.entity.Feedback;
+import inu.lecture.software_design.domain.feedback.entity.FeedbackType;
 import inu.lecture.software_design.domain.feedback.repository.FeedbackRepository;
 import inu.lecture.software_design.domain.notification.service.NotificationService;
 import inu.lecture.software_design.domain.student.entity.Student;
@@ -110,14 +111,14 @@ public class FeedbackService {
     }
 
     /**
-     * CEW-44: 피드백 필터 조회 (studentId, teacherId, from, to 선택)
+     * CEW-44: 피드백 필터 조회 (studentId, teacherId, feedbackType, from, to 선택)
      */
     @Transactional(readOnly = true)
-    public List<FeedbackResponse> getFeedbacks(Long studentId, Long teacherId, LocalDate from, LocalDate to) {
+    public List<FeedbackResponse> getFeedbacks(Long studentId, Long teacherId, FeedbackType feedbackType, LocalDate from, LocalDate to) {
         LocalDateTime fromDt = from != null ? from.atStartOfDay() : null;
         LocalDateTime toDt = to != null ? to.plusDays(1).atStartOfDay() : null;
 
-        return feedbackRepository.findByFilter(studentId, teacherId, fromDt, toDt)
+        return feedbackRepository.findByFilter(studentId, teacherId, feedbackType, fromDt, toDt)
                 .stream()
                 .map(this::toResponse)
                 .toList();
