@@ -32,4 +32,7 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
 
     /** CEW-69: 최근 피드백 n건 조회 */
     List<Feedback> findTop5ByOrderByCreatedAtDesc();
+
+    /** CEW-113/114: 분석용 - 학생별 피드백 수 */
+    long countByStudentId(Long studentId);
 }

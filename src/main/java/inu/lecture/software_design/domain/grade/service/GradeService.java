@@ -14,6 +14,8 @@ import inu.lecture.software_design.domain.teacher.entity.Teacher;
 import inu.lecture.software_design.domain.teacher.repository.TeacherRepository;
 import inu.lecture.software_design.global.exception.CustomException;
 import inu.lecture.software_design.global.exception.ErrorCode;
+import inu.lecture.software_design.global.kafka.event.GradeCreatedEvent;
+import inu.lecture.software_design.global.kafka.producer.AnalyticsEventProducer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,7 @@ public class GradeService {
     private final SubjectRepository subjectRepository;
     private final TeacherRepository teacherRepository;
     private final NotificationService notificationService;
+    private final AnalyticsEventProducer analyticsEventProducer;
 
     /**
      * CEW-32: 교사가 학생 성적 입력
@@ -68,6 +71,17 @@ public class GradeService {
 
         // CEW-57: 성적 등록 시 학생 + 학부모 알림
         notificationService.notifyGradeUpdated(student, grade);
+
+        // CEW-114: Kafka 이벤트 발행 → 분석 DB 실시간 갱신
+        analyticsEventProducer.sendGradeCreatedEvent(GradeCreatedEvent.builder()
+                .studentId(student.getId())
+                .studentName(student.getName())
+                .subjectId(subject.getId())
+                .subjectName(subject.getName())
+                .year(request.getYear())
+                .semester(request.getSemester())
+                .average(average)
+                .build());
 
         return toResponse(grade);
     }

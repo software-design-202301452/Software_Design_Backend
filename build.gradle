@@ -37,6 +37,9 @@ dependencies {
 	// Cloud SQL Connector (Cloud Run → Cloud SQL 소켓 연결)
 	implementation 'com.google.cloud.sql:mysql-socket-factory-connector-j-8:1.22.0'
 
+	// Kafka
+	implementation 'org.springframework.kafka:spring-kafka'
+
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'

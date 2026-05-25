@@ -13,6 +13,8 @@ import inu.lecture.software_design.domain.teacher.entity.Teacher;
 import inu.lecture.software_design.domain.teacher.repository.TeacherRepository;
 import inu.lecture.software_design.global.exception.CustomException;
 import inu.lecture.software_design.global.exception.ErrorCode;
+import inu.lecture.software_design.global.kafka.event.FeedbackPublishedEvent;
+import inu.lecture.software_design.global.kafka.producer.AnalyticsEventProducer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,7 @@ public class FeedbackService {
     private final StudentRepository studentRepository;
     private final TeacherRepository teacherRepository;
     private final NotificationService notificationService;
+    private final AnalyticsEventProducer analyticsEventProducer;
 
     /**
      * CEW-39: 교사가 학생 피드백 작성
@@ -94,6 +97,13 @@ public class FeedbackService {
 
         // CEW-60: 피드백 공개 시 학생 + 학부모 알림
         notificationService.notifyFeedbackPublished(feedback.getStudent(), feedback);
+
+        // CEW-114: Kafka 이벤트 발행 → 분석 DB 실시간 갱신
+        analyticsEventProducer.sendFeedbackPublishedEvent(FeedbackPublishedEvent.builder()
+                .feedbackId(feedbackId)
+                .studentId(feedback.getStudent().getId())
+                .studentName(feedback.getStudent().getName())
+                .build());
 
         return toResponse(feedback);
     }

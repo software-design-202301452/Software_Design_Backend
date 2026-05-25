@@ -42,4 +42,7 @@ public interface CounselingRepository extends JpaRepository<Counseling, Long> {
 
     /** CEW-69: 최근 상담 n건 조회 */
     List<Counseling> findTop5ByOrderByCounselingDateDesc();
+
+    /** CEW-113/114: 분석용 - 학생별 상담 수 */
+    long countByStudentId(Long studentId);
 }
