@@ -30,7 +30,7 @@ public class ChatService {
     @Value("${openai.api-key:}")
     private String openAiApiKey;
 
-    private static final String OPENAI_URL = "https://api.openai.com/v1/chat/completions";
+    private static final String OPENAI_URL = "https://factchat-cloud.mindlogic.ai/v1/api/openai/chat/completions";
     private static final String SYSTEM_PROMPT_BASE =
             "당신은 학생 관리 시스템의 AI 보조 교사입니다. " +
             "교사가 학생의 학습 현황, 성적, 피드백, 상담 내역에 대해 질문하면 분석된 데이터를 바탕으로 답변하세요. " +
@@ -79,8 +79,8 @@ public class ChatService {
     @SuppressWarnings("unchecked")
     private String callOpenAi(String systemPrompt, String userMessage) {
         if (openAiApiKey == null || openAiApiKey.isBlank() || openAiApiKey.equals("your-openai-api-key-here")) {
-            log.warn("[Chat] OpenAI API 키가 설정되지 않았습니다. 더미 응답을 반환합니다.");
-            return "[AI 챗봇 미설정] OpenAI API 키를 환경변수 OPENAI_API_KEY에 설정해주세요. " +
+            log.warn("[Chat] AI:NU API 키가 설정되지 않았습니다. 더미 응답을 반환합니다.");
+            return "[AI 챗봇 미설정] API 키를 환경변수 OPENAI_API_KEY에 설정해주세요. " +
                    "현재 질문: \"" + userMessage + "\"";
         }
 
@@ -90,7 +90,7 @@ public class ChatService {
             headers.setBearerAuth(openAiApiKey);
 
             Map<String, Object> body = Map.of(
-                    "model", "gpt-4o-mini",
+                    "model", "gpt-5-mini",
                     "messages", List.of(
                             Map.of("role", "system", "content", systemPrompt),
                             Map.of("role", "user", "content", userMessage)
