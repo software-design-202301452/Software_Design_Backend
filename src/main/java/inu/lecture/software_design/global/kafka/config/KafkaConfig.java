@@ -3,7 +3,6 @@ package inu.lecture.software_design.global.kafka.config;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SaslConfigs;
-import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -29,11 +28,11 @@ public class KafkaConfig {
     @Value("${spring.kafka.properties.security.protocol:PLAINTEXT}")
     private String securityProtocol;
 
-    @Value("${spring.kafka.properties.sasl.mechanism:PLAIN}")
-    private String saslMechanism;
+    @Value("${kafka.sasl.username:}")
+    private String saslUsername;
 
-    @Value("${spring.kafka.properties.sasl.jaas.config:}")
-    private String saslJaasConfig;
+    @Value("${kafka.sasl.password:}")
+    private String saslPassword;
 
     @Bean
     public ProducerFactory<String, Object> producerFactory() {
@@ -43,12 +42,13 @@ public class KafkaConfig {
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
         props.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, 3000);
 
-        if (!"PLAINTEXT".equals(securityProtocol)) {
+        if (!"PLAINTEXT".equals(securityProtocol) && !saslUsername.isBlank()) {
             props.put("security.protocol", securityProtocol);
-            props.put(SaslConfigs.SASL_MECHANISM, saslMechanism);
-            if (!saslJaasConfig.isBlank()) {
-                props.put(SaslConfigs.SASL_JAAS_CONFIG, saslJaasConfig);
-            }
+            props.put(SaslConfigs.SASL_MECHANISM, "SCRAM-SHA-256");
+            props.put(SaslConfigs.SASL_JAAS_CONFIG,
+                    "org.apache.kafka.common.security.scram.ScramLoginModule required " +
+                    "username=\"" + saslUsername + "\" " +
+                    "password=\"" + saslPassword + "\";");
         }
 
         return new DefaultKafkaProducerFactory<>(props);

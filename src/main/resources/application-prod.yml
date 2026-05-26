@@ -28,8 +28,6 @@ spring:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
     properties:
       security.protocol: SASL_SSL
-      sasl.mechanism: SCRAM-SHA-256
-      sasl.jaas.config: ${KAFKA_SASL_JAAS_CONFIG}
       max.block.ms: 3000
     consumer:
       group-id: analytics-group
@@ -43,6 +41,11 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     listener:
       missing-topics-fatal: false
+
+kafka:
+  sasl:
+    username: ${KAFKA_USERNAME}
+    password: ${KAFKA_PASSWORD}
 
 analytics:
   kafka:
