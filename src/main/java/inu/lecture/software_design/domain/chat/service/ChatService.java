@@ -17,7 +17,7 @@ import java.util.Optional;
 
 /**
  * CEW-117: AI 챗봇 서비스
- * 분석 DB의 학생 학습 요약 데이터를 시스템 프롬프트에 주입하여 GPT와 대화한다.
+ * AI:NU Anthropic 엔드포인트를 통해 Claude와 대화한다.
  */
 @Slf4j
 @Service
@@ -28,9 +28,10 @@ public class ChatService {
     private final RestTemplate restTemplate;
 
     @Value("${openai.api-key:}")
-    private String openAiApiKey;
+    private String apiKey;
 
-    private static final String OPENAI_URL = "https://factchat-cloud.mindlogic.ai/v1/api/openai/chat/completions";
+    private static final String ANTHROPIC_URL = "https://factchat-cloud.mindlogic.ai/v1/api/anthropic/messages";
+    private static final String MODEL = "claude-sonnet-4-5-20250929";
     private static final String SYSTEM_PROMPT_BASE =
             "당신은 학생 관리 시스템의 AI 보조 교사입니다. " +
             "교사가 학생의 학습 현황, 성적, 피드백, 상담 내역에 대해 질문하면 분석된 데이터를 바탕으로 답변하세요. " +
@@ -39,9 +40,7 @@ public class ChatService {
     public ChatResponse chat(ChatRequest request) {
         String systemPrompt = buildSystemPrompt(request.getStudentId());
         String contextDescription = buildContextDescription(request.getStudentId());
-
-        String reply = callOpenAi(systemPrompt, request.getMessage());
-
+        String reply = callClaude(systemPrompt, request.getMessage());
         return ChatResponse.builder()
                 .reply(reply)
                 .studentContext(contextDescription)
@@ -50,7 +49,6 @@ public class ChatService {
 
     private String buildSystemPrompt(Long studentId) {
         StringBuilder sb = new StringBuilder(SYSTEM_PROMPT_BASE);
-
         if (studentId != null) {
             Optional<StudentLearningSummary> summaryOpt = summaryRepository.findByStudentId(studentId);
             summaryOpt.ifPresent(s -> {
@@ -64,7 +62,6 @@ public class ChatService {
                 sb.append(String.format("마지막 데이터 갱신: %s\n", s.getLastSyncedAt()));
             });
         }
-
         return sb.toString();
     }
 
@@ -77,41 +74,39 @@ public class ChatService {
     }
 
     @SuppressWarnings("unchecked")
-    private String callOpenAi(String systemPrompt, String userMessage) {
-        if (openAiApiKey == null || openAiApiKey.isBlank() || openAiApiKey.equals("your-openai-api-key-here")) {
-            log.warn("[Chat] AI:NU API 키가 설정되지 않았습니다. 더미 응답을 반환합니다.");
-            return "[AI 챗봇 미설정] API 키를 환경변수 OPENAI_API_KEY에 설정해주세요. " +
-                   "현재 질문: \"" + userMessage + "\"";
+    private String callClaude(String systemPrompt, String userMessage) {
+        if (apiKey == null || apiKey.isBlank() || apiKey.equals("your-openai-api-key-here")) {
+            log.warn("[Chat] API 키가 설정되지 않았습니다.");
+            return "[AI 챗봇 미설정] API 키를 환경변수 OPENAI_API_KEY에 설정해주세요.";
         }
 
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setBearerAuth(openAiApiKey);
+            headers.setBearerAuth(apiKey);
 
             Map<String, Object> body = Map.of(
-                    "model", "gpt-5-chat-latest",
+                    "model", MODEL,
+                    "max_tokens", 1024,
+                    "system", systemPrompt,
                     "messages", List.of(
-                            Map.of("role", "system", "content", systemPrompt),
                             Map.of("role", "user", "content", userMessage)
-                    ),
-                    "max_tokens", 1000,
-                    "temperature", 0.7
+                    )
             );
 
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
-            ResponseEntity<Map> response = restTemplate.postForEntity(OPENAI_URL, entity, Map.class);
+            ResponseEntity<Map> response = restTemplate.postForEntity(ANTHROPIC_URL, entity, Map.class);
 
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                List<Map<String, Object>> choices = (List<Map<String, Object>>) response.getBody().get("choices");
-                if (choices != null && !choices.isEmpty()) {
-                    Map<String, Object> message = (Map<String, Object>) choices.get(0).get("message");
-                    return (String) message.get("content");
+                // Anthropic 응답 형식: {"content": [{"type": "text", "text": "..."}]}
+                List<Map<String, Object>> content = (List<Map<String, Object>>) response.getBody().get("content");
+                if (content != null && !content.isEmpty()) {
+                    return (String) content.get(0).get("text");
                 }
             }
             return "AI 응답을 가져오는 데 실패했습니다.";
         } catch (Exception e) {
-            log.error("[Chat] OpenAI 호출 실패: {}", e.getMessage());
+            log.error("[Chat] Claude 호출 실패: {}", e.getMessage());
             return "AI 서비스에 일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
         }
     }
