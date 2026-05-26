@@ -24,6 +24,35 @@ spring:
       max-file-size: 100MB
       max-request-size: 100MB
 
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    properties:
+      security.protocol: SASL_SSL
+      sasl.mechanism: SCRAM-SHA-256
+      sasl.jaas.config: ${KAFKA_SASL_JAAS_CONFIG}
+      max.block.ms: 3000
+    consumer:
+      group-id: analytics-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    listener:
+      missing-topics-fatal: false
+
+analytics:
+  kafka:
+    enabled: true
+  etl:
+    cron: "0 0 * * * *"
+
+openai:
+  api-key: ${OPENAI_API_KEY}
+
 jwt:
   key: ${JWT_SECRET_KEY}
   access-token-validity-in-seconds: 1800
