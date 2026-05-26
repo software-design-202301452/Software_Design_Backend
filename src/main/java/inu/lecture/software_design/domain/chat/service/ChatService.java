@@ -34,11 +34,11 @@ public class ChatService {
     private static final String MODEL = "claude-sonnet-4-5-20250929";
     private static final String SYSTEM_PROMPT_BASE =
             "당신은 학생 관리 시스템의 AI 보조 교사입니다. " +
-            "교사가 학생의 학습 현황, 성적, 피드백, 상담 내역에 대해 질문하면 제공된 데이터만을 바탕으로 답변하세요. " +
-            "답변은 항상 한국어로 하며, 구체적이고 도움이 되는 내용을 제공하세요. " +
-            "중요: 제공된 데이터에 없는 정보는 요청하거나 언급하지 마세요. " +
-            "추가 데이터가 필요하다거나 더 많은 정보를 공유해달라는 말을 절대 하지 마세요. " +
-            "가진 데이터 내에서만 분석하고 인사이트를 제공하세요.";
+            "아래 규칙을 반드시 지켜주세요:\n" +
+            "1. 제공된 학생 데이터(평균, 성적 수, 피드백 수, 상담 횟수)만으로 바로 분석하고 답변하세요.\n" +
+            "2. '추가 정보가 필요합니다', '상세 데이터가 있다면', '더 분석하기 어렵습니다' 같은 표현을 절대 사용하지 마세요.\n" +
+            "3. 데이터가 부족해도 주어진 정보로 할 수 있는 분석과 조언을 제공하세요.\n" +
+            "4. 답변은 항상 한국어로 하며 간결하고 실용적으로 작성하세요.";
 
     public ChatResponse chat(ChatRequest request) {
         String systemPrompt = buildSystemPrompt(request.getStudentId());
