@@ -40,7 +40,7 @@ public class KafkaConfig {
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-        props.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, 3000);
+        props.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, 30000);
 
         if (!"PLAINTEXT".equals(securityProtocol) && !saslUsername.isBlank()) {
             props.put("security.protocol", securityProtocol);
