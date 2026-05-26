@@ -90,7 +90,7 @@ public class ChatService {
             headers.setBearerAuth(openAiApiKey);
 
             Map<String, Object> body = Map.of(
-                    "model", "gpt-5-mini",
+                    "model", "gpt-5-chat-latest",
                     "messages", List.of(
                             Map.of("role", "system", "content", systemPrompt),
                             Map.of("role", "user", "content", userMessage)
