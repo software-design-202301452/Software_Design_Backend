@@ -1,0 +1,25 @@
+# ArgoCD Application — Git(k8s/) 을 정답으로 보고 클러스터 상태를 동기화한다.
+# ArgoCD 가 설치된 클러스터에서 1회 적용한다:  kubectl apply -f k8s/argocd-application.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: software-design-backend
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/software-design-202301452/Software_Design_Backend.git
+    targetRevision: main
+    path: k8s
+    directory:
+      # 비밀값(secret.example.yaml)은 동기화 대상에서 제외 — 배포 매니페스트만 관리
+      include: '{deployment.yaml,service.yaml}'
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true      # Git 에서 삭제된 리소스는 클러스터에서도 제거
+      selfHeal: true   # 클러스터를 손으로 바꿔도 Git 상태로 되돌림
+    syncOptions:
+      - CreateNamespace=true

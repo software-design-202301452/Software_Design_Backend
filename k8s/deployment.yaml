@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: software-design-backend
+  labels:
+    app: software-design-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: software-design-backend
+  template:
+    metadata:
+      labels:
+        app: software-design-backend
+    spec:
+      containers:
+        - name: backend
+          image: asia-northeast3-docker.pkg.dev/keepy-493212/software-design/backend:latest
+          ports:
+            - containerPort: 8080
+          # 일반 설정값 + 비밀값은 Secret 한 곳에서 주입 (k8s/secret.example.yaml 참고)
+          envFrom:
+            - secretRef:
+                name: software-design-secrets
+          env:
+            # Cloud SQL socketFactory 가 사용할 서비스 계정 키 경로
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /var/secrets/google/key.json
+          volumeMounts:
+            - name: gcp-sa-key
+              mountPath: /var/secrets/google
+              readOnly: true
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 40
+            periodSeconds: 10
+            failureThreshold: 6
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            failureThreshold: 4
+      volumes:
+        - name: gcp-sa-key
+          secret:
+            secretName: gcp-sa-key

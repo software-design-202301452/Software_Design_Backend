@@ -29,5 +29,9 @@ application.yml
 bin/
 HELP.md
 
+### K8s 비밀값 (실제 값 파일은 커밋 금지) ###
+k8s/secret.yaml
+k8s/sa-key.json
+
 ### Claude Code ###
 .claude/
